@@ -4,15 +4,26 @@
     "es2021": true,
     "node": true
   },
-  "extends": ["next/core-web-vitals", "plugin:react/recommended", "airbnb"],
+  "extends": [
+    "airbnb",
+    "airbnb-typescript",
+    "next/core-web-vitals",
+    "plugin:react/recommended",
+    "plugin:react/jsx-runtime"
+  ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaFeatures": {
       "jsx": true
     },
     "ecmaVersion": 12,
-    "sourceType": "module"
+    "sourceType": "module",
+    "project": "./tsconfig.json"
   },
   "plugins": ["react", "@typescript-eslint"],
-  "rules": {}
+  "rules": {
+    "prefer-destructuring": "off", // Does not work with environment variables in next
+    "react/function-component-definition": "off",
+    "react/jsx-props-no-spreading": "off"
+  }
 }
