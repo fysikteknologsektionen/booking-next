@@ -1,5 +1,6 @@
 import { signIn, signOut, useSession } from 'next-auth/react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const Header: React.VFC = () => {
   const { data: session } = useSession();
@@ -7,20 +8,17 @@ const Header: React.VFC = () => {
   return (
     <header className="bg-light">
       <nav className="navbar navbar-light container">
-        <a
-          href="https://ftek.se"
-          target="_blank"
-          rel="noreferrer"
-          className="navbar-brand"
-        >
-          <Image
-            src="/ftek.svg"
-            alt="Fysikteknologsektionen"
-            layout="fixed"
-            width={48}
-            height={48}
-          />
-        </a>
+        <Link href="/" passHref>
+          <a className="navbar-brand">
+            <Image
+              src="/ftek.svg"
+              alt="Fysikteknologsektionen"
+              layout="fixed"
+              width={50}
+              height={50}
+            />
+          </a>
+        </Link>
         {session ? (
           <button
             className="btn btn-outline-secondary"
