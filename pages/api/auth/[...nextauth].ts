@@ -45,9 +45,13 @@ export default NextAuth({
     async session({ session }) {
       // Add the venues that the user manages to the session object
       const userDoc = await User.findOne({ email: session.user?.email });
-      // This is how it's done in the docs
-      // eslint-disable-next-line no-param-reassign
-      session.manages = userDoc.manages;
+      // Add extra data to session if the user exists locally
+      // (this function may be called before the user can be saved on first signin)
+      if (userDoc) {
+        // This is how it's done in the docs
+        // eslint-disable-next-line no-param-reassign
+        session.manages = userDoc.manages;
+      }
       return session;
     },
   },
