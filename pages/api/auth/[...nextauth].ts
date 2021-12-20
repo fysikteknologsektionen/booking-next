@@ -1,5 +1,6 @@
 import NextAuth from 'next-auth/next';
 import GoogleProvider from 'next-auth/providers/google';
+import User from '../../../models/User';
 
 const OAUTH_CLIENT_ID = process.env.OAUTH_CLIENT_ID;
 const OAUTH_CLIENT_SECRET = process.env.OAUTH_CLIENT_SECRET;
@@ -22,11 +23,29 @@ export default NextAuth({
   secret: SECRET,
   debug: NODE_ENV === 'development',
   callbacks: {
-    async signIn({ profile }) {
-      if (profile.email_verified && profile.email) {
-        return profile.email.endsWith('@ftek.se');
+    async signIn({ profile, user }) {
+      if (profile.email_verified && profile.email?.endsWith('@ftek.se')) {
+        const userData = {
+          name: user.name,
+          email: user.email,
+          image: user.image,
+          googleId: user.id,
+        };
+        // Update local user data with data from Google
+        await User.findOneAndUpdate({ googleId: user.id }, userData, {
+          upsert: true,
+        });
+        return true;
       }
       return false;
+    },
+    async session({ session }) {
+      // Add the venues that the user manages to the session object
+      const userDoc = await User.findOne({ email: session.user?.email });
+      // This is how it's done in the docs
+      // eslint-disable-next-line no-param-reassign
+      session.manages = userDoc.manages;
+      return session;
     },
   },
 });
