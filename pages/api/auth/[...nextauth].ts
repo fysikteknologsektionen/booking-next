@@ -1,5 +1,6 @@
 import NextAuth from 'next-auth/next';
 import GoogleProvider from 'next-auth/providers/google';
+import dbConnect from '../../../lib/dbConnect';
 import User from '../../../models/User';
 
 const OAUTH_CLIENT_ID = process.env.OAUTH_CLIENT_ID;
@@ -25,6 +26,8 @@ export default NextAuth({
   callbacks: {
     async signIn({ profile, user }) {
       if (profile.email_verified && profile.email?.endsWith('@ftek.se')) {
+        await dbConnect();
+
         const userData = {
           name: user.name,
           email: user.email,

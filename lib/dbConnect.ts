@@ -1,0 +1,36 @@
+import mongoose from 'mongoose';
+
+const DB_CONNECTION_STRING = process.env.DB_CONNECTION_STRING;
+
+if (!DB_CONNECTION_STRING) {
+  throw new Error(
+    'Please set the DB_CONNECTION_STRING environment variables inside .env.local',
+  );
+}
+
+let cached = global.mongoose;
+
+if (!cached) {
+  global.mongoose = { conn: null, promise: null };
+  cached = global.mongoose;
+}
+
+async function dbConnect() {
+  if (cached.conn) {
+    return cached.conn;
+  }
+
+  if (!cached.promise) {
+    const opts = {
+      bufferCommands: false,
+    };
+
+    cached.promise = mongoose
+      .connect(DB_CONNECTION_STRING!, opts)
+      .then((conn) => conn);
+  }
+  cached.conn = await cached.promise;
+  return cached.conn;
+}
+
+export default dbConnect;
