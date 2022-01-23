@@ -14,12 +14,35 @@ interface User {
   name: string;
   email: string;
   image?: string;
-  manages: [PopulatedDoc<Venue, Types.ObjectId>];
+  isAdmin: boolean;
+}
+
+interface Timeslot {
+  startTime: Date;
+  endTime: Date;
+  weekdays: number[];
 }
 
 interface Venue {
   name: string;
   description?: string;
-  manager?: PopulatedDoc<string, Types.ObjectId>;
+  managers: PopulatedDoc<User, Types.ObjectId>[];
   enabled: boolean;
+  timeslots: Timeslot[];
+}
+
+type ReservationStatus = 'accepted' | 'pending' | 'declined';
+
+interface Reservation {
+  clientName: string;
+  clientEmail: string;
+  clientPhoneNumber: string;
+  clientGroup?: string;
+  description: string;
+  venue: PopulatedDoc<Venue, Types.ObjectId>;
+  startTime: Date;
+  endTime: Date;
+  status: ReservationStatus;
+  timeslot?: PopulatedDoc<Timeslot, Types.ObjectId>;
+  comment?: string;
 }
