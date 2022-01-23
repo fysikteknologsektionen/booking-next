@@ -25,6 +25,8 @@
     "prefer-destructuring": "off", // Does not work with environment variables in next
     "react/function-component-definition": "off",
     "react/jsx-props-no-spreading": "off",
-    "jsx-a11y/anchor-is-valid": "off" //Incompatible with next/link
+    "jsx-a11y/anchor-is-valid": "off", //Incompatible with next/link
+    "react/prop-types": "off", // Interferes with function declaration syntax
+    "no-underscore-dangle": "off" // Works poorly with mongoose
   }
 }
