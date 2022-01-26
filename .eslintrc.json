@@ -20,6 +20,7 @@
     "sourceType": "module",
     "project": "./tsconfig.json"
   },
+  "ignorePatterns": "**/*.js",
   "plugins": ["react", "@typescript-eslint"],
   "rules": {
     "prefer-destructuring": "off", // Does not work with environment variables in next
