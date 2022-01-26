@@ -17,14 +17,16 @@ const userSchema = new Schema<User>({
     /** User's email, managed by Google */
     type: String,
     required: true,
-    unique: true,
   },
   image:
     /** Link to user's image, managed by Google */
     String,
-  manages:
-    /** Array of venues that the user is a manager of */
-    [{ type: Schema.Types.ObjectId, ref: 'Venue' }],
+  isAdmin: {
+    /** Whether the user is an admin */
+    type: Boolean,
+    required: true,
+    default: false,
+  },
 });
 
 export default models.User || model('User', userSchema);
