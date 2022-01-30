@@ -1,4 +1,4 @@
-import mongoose, { Connection, PopulatedDoc, Types } from 'mongoose';
+import mongoose, { Connection, Document, PopulatedDoc, Types } from 'mongoose';
 
 declare global {
   // This is the correct way to extend globalThis as of node 16+
@@ -17,26 +17,30 @@ interface User {
   isAdmin: boolean;
 }
 
+interface UserDocument extends User, Document {}
+
 interface Timeslot {
   startTime: Date;
   endTime: Date;
-  weekdays: number[];
+  weekdaysIndex: Types.Array<Number>;
 }
 
 interface Venue {
   name: string;
   description?: string;
-  managers: PopulatedDoc<User, Types.ObjectId>[];
+  managers: Types.DocumentArray<UserDocument>;
   enabled: boolean;
-  timeslots: Timeslot[];
+  timeslots: Types.DocumentArray<Timeslot>;
 }
+
+interface VenueDocument extends Venue, Document {}
 
 type ReservationStatus = 'accepted' | 'pending' | 'declined';
 
 interface Reservation {
   clientName: string;
   clientEmail: string;
-  clientPhoneNumber: string;
+  clientTel: string;
   clientGroup?: string;
   description: string;
   venue: PopulatedDoc<Venue, Types.ObjectId>;
@@ -45,4 +49,5 @@ interface Reservation {
   status: ReservationStatus;
   timeslot?: PopulatedDoc<Timeslot, Types.ObjectId>;
   comment?: string;
+  readonly timestamp: Date;
 }
