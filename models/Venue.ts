@@ -1,38 +1,31 @@
 import {
-  Model, model, models, Schema,
+  Model,
+  model,
+  models,
+  Schema,
 } from 'mongoose';
-import { Timeslot, Venue } from '../types';
+import type { Timeslot, VenueDocument } from 'types';
 
 const timeslotSchema = new Schema<Timeslot>({
-  startTime: {
-    /** Start time of the timeslot */
-    type: Date,
-    required: true,
-  },
-  endTime: {
-    /** End time of the timeslot */
-    type: Date,
-    required: true,
-  },
-  weekdays:
-    /** Array of weekday indicies that timeslot should exist for (0 is Monday, 6 is Sunday) */
-    [Number],
+  startTime: { type: Date, required: true },
+  endTime: { type: Date, required: true },
+  weekdaysIndex: [Number],
 });
 
-const venueSchema = new Schema<Venue>({
+const venueSchema = new Schema<VenueDocument>({
   name: {
-    /** Venue name */
     type: String,
     required: true,
+    minlength: 1,
+    maxlength: 100,
   },
-  description:
-    /** Venue description */
-    String,
-  managers:
-    /** Venue managers */
-    [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  description: {
+    type: String,
+    minlength: 1,
+    maxlength: 500,
+  },
+  managers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   enabled: {
-    /** Whether the venue is enabled and should be listed */
     type: Boolean,
     required: true,
     default: false,
@@ -40,4 +33,6 @@ const venueSchema = new Schema<Venue>({
   timeslots: [timeslotSchema],
 });
 
-export default (models.Venue as Model<Venue>) || model('Venue', venueSchema);
+const VenueModel = (models.Venue as Model<VenueDocument>) || model('Venue', venueSchema);
+
+export default VenueModel;
