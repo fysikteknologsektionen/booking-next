@@ -15,6 +15,10 @@ if (!cached) {
   cached = global.mongoose;
 }
 
+/**
+ * Gets a cached connection to mongoose or creates a new one if none is cached
+ * @returns A (cached) mongoose connection
+ */
 async function dbConnect() {
   if (cached.conn) {
     return cached.conn;
