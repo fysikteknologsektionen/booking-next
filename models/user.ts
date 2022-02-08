@@ -4,14 +4,28 @@ import {
   models,
   Schema,
 } from 'mongoose';
-import type { UserDocument } from 'types';
+
+type UserRole = 'user' | 'manager' | 'admin';
+interface User {
+  googleId: string;
+  name: string;
+  email: string;
+  image?: string;
+  role: UserRole;
+}
+export interface UserDocument extends User, Document {}
 
 const userSchema = new Schema<UserDocument>({
   googleId: { type: String, required: true, unique: true },
   name: { type: String, required: true },
   email: { type: String, required: true },
   image: String,
-  isAdmin: { type: Boolean, required: true, default: false },
+  role: {
+    type: String,
+    enum: ['user', 'manager', 'admin'],
+    required: true,
+    default: 'user',
+  },
 });
 
 const UserModel = (models.User as Model<UserDocument>) || model('User', userSchema);

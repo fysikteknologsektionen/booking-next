@@ -3,14 +3,17 @@ import {
   model,
   models,
   Schema,
+  Types,
 } from 'mongoose';
-import type { Timeslot, VenueDocument } from 'types';
+import { UserDocument } from './user';
 
-const timeslotSchema = new Schema<Timeslot>({
-  startTime: { type: Date, required: true },
-  endTime: { type: Date, required: true },
-  weekdaysIndex: [Number],
-});
+interface Venue {
+  name: string;
+  description?: string;
+  managers: Types.DocumentArray<UserDocument>;
+  enabled: boolean;
+}
+export interface VenueDocument extends Venue, Document {}
 
 const venueSchema = new Schema<VenueDocument>({
   name: {
@@ -30,7 +33,6 @@ const venueSchema = new Schema<VenueDocument>({
     required: true,
     default: false,
   },
-  timeslots: [timeslotSchema],
 });
 
 const VenueModel = (models.Venue as Model<VenueDocument>) || model('Venue', venueSchema);
