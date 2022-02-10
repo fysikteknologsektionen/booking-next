@@ -1,18 +1,16 @@
-import {
-  Model,
-  model,
-  models,
-  Schema,
-  Types,
+import type {
+  Document, Model, PopulatedDoc, Types,
 } from 'mongoose';
-import { UserDocument } from './user';
+import { model, models, Schema } from 'mongoose';
+import type { UserDocument } from './UserModel';
 
-interface Venue {
+export interface Venue {
   name: string;
   description?: string;
-  managers: Types.DocumentArray<UserDocument>;
+  managers: PopulatedDoc<UserDocument, Types.ObjectId>[];
   enabled: boolean;
 }
+
 export interface VenueDocument extends Venue, Document {}
 
 const venueSchema = new Schema<VenueDocument>({
@@ -24,7 +22,6 @@ const venueSchema = new Schema<VenueDocument>({
   },
   description: {
     type: String,
-    minlength: 1,
     maxlength: 500,
   },
   managers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
