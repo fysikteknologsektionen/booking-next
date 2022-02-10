@@ -1,4 +1,4 @@
-import UserModel from '@models/user';
+import UserModel from '@models/UserModel';
 import NextAuth from 'next-auth/next';
 import GoogleProvider from 'next-auth/providers/google';
 import dbConnect from '../../../lib/dbConnect';
