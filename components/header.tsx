@@ -6,7 +6,7 @@ const Header: React.VFC = () => {
   const { data: session } = useSession();
 
   return (
-    <header className="bg-light">
+    <header className="bg-light mb-3">
       <nav className="navbar navbar-light container">
         <Link href="/" passHref>
           <a className="navbar-brand">
@@ -20,20 +20,12 @@ const Header: React.VFC = () => {
           </a>
         </Link>
         {session ? (
-          <button
-            className="btn btn-outline-secondary"
-            type="button"
-            onClick={() => signOut()}
-          >
-            Logga ut
+          <button className="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar" aria-expanded="false" aria-label="Toggle sidebar">
+            <span className="navbar-toggler-icon" />
           </button>
         ) : (
-          <button
-            className="btn btn-outline-secondary"
-            type="button"
-            onClick={() => signIn('google')}
-          >
-            Logga in
+          <button className="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar" aria-expanded="false" aria-label="Toggle sidebar">
+            <span className="navbar-toggler-icon" />
           </button>
         )}
       </nav>
