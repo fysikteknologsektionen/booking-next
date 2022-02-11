@@ -14,12 +14,6 @@ if (!cached) {
  * @returns A (cached) mongoose connection
  */
 async function dbConnect() {
-  if (!DB_CONNECTION_STRING) {
-    throw new Error(
-      'Please set the DB_CONNECTION_STRING environment variables inside .env.local',
-    );
-  }
-
   if (cached.conn) {
     return cached.conn;
   }
@@ -28,6 +22,12 @@ async function dbConnect() {
     const opts = {
       bufferCommands: false,
     };
+    
+    if (!DB_CONNECTION_STRING) {
+      throw new Error(
+        'Please set the DB_CONNECTION_STRING environment variables inside .env.local',
+      );
+    }
 
     cached.promise = mongoose
       .connect(DB_CONNECTION_STRING, opts)
