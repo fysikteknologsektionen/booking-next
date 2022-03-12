@@ -20,36 +20,27 @@ const ViewVenues: NextPage<
 InferGetServerSidePropsType<typeof getServerSideProps>
 > = ({ venues }) => (
   <DashboardLayout>
-    <table className="table">
+    <table className="table table-hover">
       <thead>
         <th scope="col">Name</th>
         <th scope="col">Managers</th>
         <th scope="col">Status</th>
-        <th scope="col" aria-label="Edit" />
       </thead>
       <tbody>
         {venues.map((venue) => (
-          <tr key={venue._id}>
-            <td>{venue.name}</td>
-            <td>{venue.managers}</td>
-            <td>
-              {venue.enabled ? (
-                <span className="text-success">Enabled</span>
-              ) : (
-                <span className="text-danger">Disabled</span>
-              )}
-            </td>
-            <td style={{ width: 0 }}>
-              <Link href={`/dashboard/venues/${venue._id}`} passHref>
-                <button
-                  className="btn btn-sm btn-outline-secondary"
-                  type="button"
-                >
-                  View
-                </button>
-              </Link>
-            </td>
-          </tr>
+          <Link key={venue._id} href={`/dashboard/venues/${venue._id}`} passHref>
+            <tr style={{ cursor: 'pointer' }}>
+              <td>{venue.name}</td>
+              <td>{venue.managers}</td>
+              <td>
+                {venue.enabled ? (
+                  <span className="text-success">Enabled</span>
+                ) : (
+                  <span className="text-danger">Disabled</span>
+                )}
+              </td>
+            </tr>
+          </Link>
         ))}
       </tbody>
     </table>
