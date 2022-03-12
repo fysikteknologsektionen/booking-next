@@ -1,12 +1,17 @@
 import { Field, Form, Formik } from 'formik';
-import type { InferGetServerSidePropsType, NextPage } from 'next';
+import type { GetServerSideProps, NextPage } from 'next';
 import type { Venue, VenueDocument } from '@models/VenueModel';
+import type { UserDocument } from '@models/UserModel';
 import UserModel from '@models/UserModel';
 import DashboardLayout from '@components/DashboardLayout';
 import { useRouter } from 'next/router';
 import type { LeanDocument } from 'mongoose';
 
-export const getServerSideProps = async () => {
+interface Props {
+  managers: LeanDocument<UserDocument & { _id: any }>[]
+}
+
+export const getServerSideProps: GetServerSideProps<Props> = async () => {
   const managers = await UserModel.find()
     .where('role')
     .in(['manager', 'admin'])
@@ -27,9 +32,7 @@ const initialValues: Venue = {
   enabled: false,
 };
 
-const CreateVenue: NextPage<
-InferGetServerSidePropsType<typeof getServerSideProps>
-> = ({ managers }) => {
+const CreateVenue: NextPage<Props> = ({ managers }) => {
   const router = useRouter();
   return (
     <DashboardLayout>
@@ -44,9 +47,11 @@ InferGetServerSidePropsType<typeof getServerSideProps>
               },
               body: JSON.stringify(values),
             });
+
             if (!res.ok) {
               throw new Error(`Network error: ${res.status} ${res.statusText}`);
             }
+
             const venue: LeanDocument<VenueDocument> = await res.json();
             router.push(`/dashboard/venues/${venue._id}`);
           } catch (error) {

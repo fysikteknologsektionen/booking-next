@@ -1,24 +1,27 @@
 import DashboardLayout from '@components/DashboardLayout';
 import type { VenueDocument } from '@models/VenueModel';
 import type { LeanDocument } from 'mongoose';
-import type { InferGetServerSidePropsType, NextPage } from 'next';
+import type { GetServerSideProps, NextPage } from 'next';
 import Link from 'next/link';
 import { indexVenues } from 'pages/api/venues';
 
-export const getServerSideProps = async () => {
+interface Props {
+  venues: LeanDocument<VenueDocument>[] & { id: any };
+}
+
+export const getServerSideProps: GetServerSideProps<Props> = async () => {
   const venues = await indexVenues({});
+
   return {
     props: {
       venues: JSON.parse(
         JSON.stringify(venues),
-      ) as LeanDocument<VenueDocument>[],
+      ),
     },
   };
 };
 
-const ViewVenues: NextPage<
-InferGetServerSidePropsType<typeof getServerSideProps>
-> = ({ venues }) => (
+const ViewVenues: NextPage<Props> = ({ venues }) => (
   <DashboardLayout>
     <table className="table table-hover">
       <thead>
