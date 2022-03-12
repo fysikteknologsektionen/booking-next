@@ -1,25 +1,22 @@
 import DashboardLayout from '@components/DashboardLayout';
-import dbConnect from '@lib/dbConnect';
-import parseObjectId from '@lib/parseObjectId';
-import VenueModel from '@models/VenueModel';
-import type {
-  InferGetServerSidePropsType,
-  NextPage,
-} from 'next';
+import type { VenueDocument } from '@models/VenueModel';
+import type { LeanDocument } from 'mongoose';
+import type { InferGetServerSidePropsType, NextPage } from 'next';
 import Link from 'next/link';
+import { indexVenues } from 'pages/api/venues';
 
 export const getServerSideProps = async () => {
-  await dbConnect();
-  const venueDocs = await VenueModel.find().lean().exec();
-  const venues = parseObjectId(venueDocs);
+  const venues = await indexVenues({});
   return {
     props: {
-      venues,
+      venues: JSON.parse(
+        JSON.stringify(venues),
+      ) as LeanDocument<VenueDocument>[],
     },
   };
 };
 
-const ListVenues: NextPage<
+const ViewVenues: NextPage<
 InferGetServerSidePropsType<typeof getServerSideProps>
 > = ({ venues }) => (
   <DashboardLayout>
@@ -35,21 +32,33 @@ InferGetServerSidePropsType<typeof getServerSideProps>
           <tr key={venue._id}>
             <td>{venue.name}</td>
             <td>{venue.managers}</td>
-            <td>{venue.enabled ? <span className="text-success">Enabled</span> : <span className="text-danger">Disabled</span>}</td>
+            <td>
+              {venue.enabled ? (
+                <span className="text-success">Enabled</span>
+              ) : (
+                <span className="text-danger">Disabled</span>
+              )}
+            </td>
             <td style={{ width: 0 }}>
-              <Link href={`/dashboard/venues/${venue._id}/edit`} passHref>
-                <button className="btn btn-outline-secondary" type="button">Edit</button>
+              <Link href={`/dashboard/venues/${venue._id}`} passHref>
+                <button
+                  className="btn btn-sm btn-outline-secondary"
+                  type="button"
+                >
+                  View
+                </button>
               </Link>
-
             </td>
           </tr>
         ))}
       </tbody>
     </table>
     <Link href="/dashboard/venues/create" passHref>
-      <button className="btn btn-outline-primary" type="button">+ Create new venue</button>
+      <button className="btn btn-outline-primary" type="button">
+        + Create new venue
+      </button>
     </Link>
   </DashboardLayout>
 );
 
-export default ListVenues;
+export default ViewVenues;
