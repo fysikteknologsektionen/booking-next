@@ -52,8 +52,7 @@ const CreateVenue: NextPage<Props> = ({ managers }) => {
               throw new Error(`Network error: ${res.status} ${res.statusText}`);
             }
 
-            const venue: LeanDocument<VenueDocument> = await res.json();
-            router.push(`/dashboard/venues/${venue._id}`);
+            router.push('/dashboard/venues');
           } catch (error) {
             setStatus({ error });
           }
