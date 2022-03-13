@@ -26,7 +26,7 @@ jobs:
         run: npm ci --ignore-scripts
 
       - name: Check typescript files
-        run: npm run ts-check
+        run: npx tsc --noEmit
 
       - name: Run eslint
-        run: npm run lint
+        run: npx eslint .
