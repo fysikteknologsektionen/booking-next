@@ -24,6 +24,7 @@ const ViewVenues: NextPage<Props> = ({ venues }) => (
     <table className="table table-hover align-middle">
       <thead>
         <th scope="col">Name</th>
+        <th scope="col">Description</th>
         <th scope="col">Managers</th>
         <th scope="col">Status</th>
         <th scope="col" aria-label="Options" />
@@ -32,6 +33,7 @@ const ViewVenues: NextPage<Props> = ({ venues }) => (
         {venues.map((venue) => (
           <tr key={venue._id}>
             <td>{venue.name}</td>
+            <td>{venue.description}</td>
             <td>{venue.managers}</td>
             <td>
               {venue.enabled ? (
