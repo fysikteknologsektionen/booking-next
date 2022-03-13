@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { indexVenues } from 'pages/api/venues';
 
 interface Props {
-  venues: LeanDocument<VenueDocument>[] & { id: any };
+  venues: LeanDocument<VenueDocument>[];
 }
 
 export const getServerSideProps: GetServerSideProps<Props> = async () => {

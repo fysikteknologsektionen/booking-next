@@ -8,7 +8,7 @@ import { useRouter } from 'next/router';
 import type { LeanDocument } from 'mongoose';
 
 interface Props {
-  managers: LeanDocument<UserDocument & { _id: any }>[];
+  managers: LeanDocument<UserDocument>[];
 }
 
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
