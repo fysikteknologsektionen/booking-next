@@ -10,7 +10,7 @@ interface Props {
 }
 
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
-  const venues = await indexVenues({});
+  const venues = await indexVenues();
 
   return {
     props: {
@@ -76,7 +76,7 @@ const ViewVenues: NextPage<Props> = ({ venues }) => (
     </table>
     <Link href="/dashboard/venues/create" passHref>
       <button className="btn btn-outline-primary" type="button">
-        + Create new venue
+        + New
       </button>
     </Link>
   </DashboardLayout>

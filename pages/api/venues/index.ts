@@ -18,10 +18,7 @@ export const createVenue = async (body: Record<string, any>) => {
   return venue;
 };
 
-export const indexVenues = async (query: {
-  [key: string]: string | string[];
-}) => {
-  console.log(query);
+export const indexVenues = async () => {
   await dbConnect();
   const venues = await VenueModel.find().lean().exec();
   return venues;
@@ -38,7 +35,7 @@ const handler = async (
       case 'POST':
         return res.json(await createVenue(req.body));
       case 'GET':
-        return res.json(await indexVenues(req.query));
+        return res.json(await indexVenues());
       default:
         return res.status(405).setHeader('Allow', ['GET', 'POST']).end();
     }
