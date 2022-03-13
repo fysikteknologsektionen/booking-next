@@ -14,9 +14,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async () => {
 
   return {
     props: {
-      venues: JSON.parse(
-        JSON.stringify(venues),
-      ),
+      venues: JSON.parse(JSON.stringify(venues)),
     },
   };
 };
@@ -31,7 +29,11 @@ const ViewVenues: NextPage<Props> = ({ venues }) => (
       </thead>
       <tbody>
         {venues.map((venue) => (
-          <Link key={venue._id} href={`/dashboard/venues/${venue._id}`} passHref>
+          <Link
+            key={venue._id}
+            href={`/dashboard/venues/${venue._id}`}
+            passHref
+          >
             <tr style={{ cursor: 'pointer' }}>
               <td>{venue.name}</td>
               <td>{venue.managers}</td>

@@ -22,7 +22,7 @@ async function dbConnect() {
     const opts = {
       bufferCommands: false,
     };
-    
+
     if (!DB_CONNECTION_STRING) {
       throw new Error(
         'Please set the DB_CONNECTION_STRING environment variables inside .env.local',

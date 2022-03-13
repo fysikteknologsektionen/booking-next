@@ -10,7 +10,11 @@ interface Props {
 }
 
 const NavLink: React.VFC<Props> = ({
-  href, exact = false, children, className, ...props
+  href,
+  exact = false,
+  children,
+  className,
+  ...props
 }) => {
   const { pathname } = useRouter();
   const isActive = exact ? pathname === href : pathname.startsWith(href);

@@ -8,7 +8,7 @@ import { useRouter } from 'next/router';
 import type { LeanDocument } from 'mongoose';
 
 interface Props {
-  managers: LeanDocument<UserDocument & { _id: any }>[]
+  managers: LeanDocument<UserDocument & { _id: any }>[];
 }
 
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
@@ -91,10 +91,18 @@ const CreateVenue: NextPage<Props> = ({ managers }) => {
               </label>
             </div>
             <span className="text-muted mt-3">*Mandatory fields</span>
-            <button type="submit" className="btn btn-primary mt-3" disabled={isSubmitting}>
+            <button
+              type="submit"
+              className="btn btn-primary mt-3"
+              disabled={isSubmitting}
+            >
               Create
             </button>
-            { status?.error && <div className="alert alert-danger mt-3">{status.error.message}</div> }
+            {status?.error && (
+              <div className="alert alert-danger mt-3">
+                {status.error.message}
+              </div>
+            )}
           </Form>
         )}
       </Formik>

@@ -1,4 +1,5 @@
-import mongoose, { Connection } from 'mongoose';
+import type { Connection } from 'mongoose';
+import type mongoose from 'mongoose';
 
 declare global {
   // This is the correct way to extend globalThis as of node 16+

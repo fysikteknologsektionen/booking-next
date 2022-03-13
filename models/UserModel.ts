@@ -1,13 +1,5 @@
-import type {
-  Document,
-  Model,
-  Query,
-} from 'mongoose';
-import {
-  Schema,
-  model,
-  models,
-} from 'mongoose';
+import type { Document, Model, Query } from 'mongoose';
+import { Schema, model, models } from 'mongoose';
 
 type UserRole = 'user' | 'manager' | 'admin';
 
@@ -57,8 +49,11 @@ const userSchema = new Schema<UserDocument, UserModel>({
  * @returns Query chain
  */
 // eslint-disable-next-line @typescript-eslint/space-before-function-paren, func-names
-userSchema.query.byRole = function(role: UserRole): Query<any, UserDocument> & UserQueryHelpers {
+userSchema.query.byRole = function (
+  role: UserRole,
+): Query<any, UserDocument> & UserQueryHelpers {
   return this.find({ role });
 };
 
-export default (models.User as UserModel) || model<UserDocument, UserModel>('User', userSchema);
+export default (models.User as UserModel)
+  || model<UserDocument, UserModel>('User', userSchema);
