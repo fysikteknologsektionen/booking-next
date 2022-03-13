@@ -1,4 +1,4 @@
-import { signIn, signOut, useSession } from 'next-auth/react';
+import { signIn, useSession } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -20,12 +20,24 @@ const Header: React.VFC = () => {
           </a>
         </Link>
         {session ? (
-          <button className="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar" aria-expanded="false" aria-label="Toggle sidebar">
+          <button
+            className="navbar-toggler"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#sidebar"
+            aria-controls="sidebar"
+            aria-expanded="false"
+            aria-label="Toggle sidebar"
+          >
             <span className="navbar-toggler-icon" />
           </button>
         ) : (
-          <button className="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar" aria-expanded="false" aria-label="Toggle sidebar">
-            <span className="navbar-toggler-icon" />
+          <button
+            className="btn btn-outline-secondary"
+            type="button"
+            onClick={() => (process.env.NODE_ENV !== 'production' ? signIn() : signIn('google'))}
+          >
+            Log in
           </button>
         )}
       </nav>
