@@ -10,7 +10,10 @@ export default function App({
   pageProps: { session, ...pageProps },
 }: AppProps) {
   useEffect(() => {
-    import('bootstrap/dist/js/bootstrap');
+    // Since we directly import the js bootstrap library no types will exist,
+    // so expect to get an error when compiling ts
+    // @ts-expect-error
+    import('bootstrap/dist/js/bootstrap.min');
   }, []);
   return (
     <SessionProvider session={session}>
