@@ -1,12 +1,19 @@
 import dbConnect from '@lib/dbConnect';
+import getWhitelistedEntries from '@lib/getWhitelistedEntries';
 import type { Venue, VenueDocument } from '@models/VenueModel';
 import VenueModel from '@models/VenueModel';
 import type { LeanDocument } from 'mongoose';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-export const createVenue = async (body: Venue) => {
+export const createVenue = async (body: Record<string, any>) => {
+  const data = getWhitelistedEntries<Venue>(body, [
+    'name',
+    'description',
+    'managers',
+    'enabled',
+  ]);
   await dbConnect();
-  const venue = new VenueModel({ ...body });
+  const venue = new VenueModel(data);
   await venue.save();
   return venue;
 };
