@@ -32,7 +32,8 @@
     "@typescript-eslint/consistent-type-imports": "error",
     "jsx-a11y/label-has-associated-control": [
       "error",
-      { "controlComponents": ["Field"] }
-    ]
+      { "controlComponents": ["Field"] } // Allow formik fields
+    ],
+    "no-console": ["warn", { "allow": ["error"] }] // Allow error logging to backend
   }
 }
