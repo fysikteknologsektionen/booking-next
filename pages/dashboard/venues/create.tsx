@@ -1,6 +1,6 @@
 import { Field, Form, Formik } from 'formik';
 import type { GetServerSideProps, NextPage } from 'next';
-import type { Venue, VenueDocument } from '@models/VenueModel';
+import type { Venue } from '@models/VenueModel';
 import type { UserDocument } from '@models/UserModel';
 import UserModel from '@models/UserModel';
 import DashboardLayout from '@components/DashboardLayout';
