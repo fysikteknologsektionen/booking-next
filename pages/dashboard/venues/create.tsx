@@ -1,4 +1,4 @@
-import { Field, Form, Formik } from 'formik';
+import { Formik } from 'formik';
 import type { GetServerSideProps, NextPage } from 'next';
 import type { Venue } from '@models/VenueModel';
 import type { UserDocument } from '@models/UserModel';
@@ -6,6 +6,7 @@ import UserModel from '@models/UserModel';
 import DashboardLayout from '@components/DashboardLayout';
 import { useRouter } from 'next/router';
 import type { LeanDocument } from 'mongoose';
+import VenueForm from '@components/VenueForm';
 
 interface Props {
   managers: LeanDocument<UserDocument>[];
@@ -59,50 +60,12 @@ const CreateVenue: NextPage<Props> = ({ managers }) => {
         }}
       >
         {({ isSubmitting, status }) => (
-          <Form className="d-flex flex-column">
-            <label htmlFor="name" className="form-label">
-              Name*
-            </label>
-            <Field type="text" id="name" name="name" required />
-            <label htmlFor="description" className="form-label mt-3">
-              Description
-            </label>
-            <Field type="text" id="description" name="description" />
-            <label htmlFor="managers" className="form-label mt-3">
-              Managers
-            </label>
-            <Field as="select" multiple id="managers" name="managers">
-              {managers.map((manager) => (
-                <option key={manager.id} value={manager.id}>
-                  {manager.email}
-                </option>
-              ))}
-            </Field>
-            <div className="form-check form-switch mt-3">
-              <Field
-                type="checkbox"
-                id="enabled"
-                name="enabled"
-                className="form-check-input"
-              />
-              <label htmlFor="enabled" className="form-check-label">
-                Enabled
-              </label>
-            </div>
-            <span className="text-muted mt-3">*Mandatory fields</span>
-            <button
-              type="submit"
-              className="btn btn-primary mt-3"
-              disabled={isSubmitting}
-            >
-              Create
-            </button>
-            {status?.error && (
-              <div className="alert alert-danger mt-3">
-                {status.error.message}
-              </div>
-            )}
-          </Form>
+          <VenueForm
+            isSubmitting={isSubmitting}
+            status={status}
+            managers={managers}
+            submitButtonText="Create"
+          />
         )}
       </Formik>
     </DashboardLayout>
