@@ -1,28 +1,8 @@
-import dbConnect from '@lib/dbConnect';
-import getWhitelistedEntries from '@lib/getWhitelistedEntries';
-import type { Venue, VenueDocument } from '@models/VenueModel';
-import VenueModel from '@models/VenueModel';
+import HTTPResponseError from 'lib/HTTPResponseError';
+import type { VenueDocument } from 'models/VenueModel';
+import VenueController from 'controllers/VenueController';
 import type { LeanDocument } from 'mongoose';
 import type { NextApiRequest, NextApiResponse } from 'next';
-
-export const createVenue = async (body: Record<string, any>) => {
-  const data = getWhitelistedEntries<Venue>(body, [
-    'name',
-    'description',
-    'managers',
-    'enabled',
-  ]);
-  await dbConnect();
-  const venue = new VenueModel(data);
-  await venue.save();
-  return venue;
-};
-
-export const indexVenues = async () => {
-  await dbConnect();
-  const venues = await VenueModel.find().lean().exec();
-  return venues;
-};
 
 const handler = async (
   req: NextApiRequest,
@@ -30,17 +10,23 @@ const handler = async (
   LeanDocument<VenueDocument> | LeanDocument<VenueDocument>[]
   >,
 ) => {
+  const controller = new VenueController();
   try {
     switch (req.method) {
-      case 'POST':
-        return res.json(await createVenue(req.body));
       case 'GET':
-        return res.json(await indexVenues());
+        return res.json(await controller.index());
+      case 'POST':
+        return res.json(await controller.create(req.body));
       default:
         return res.status(405).setHeader('Allow', ['GET', 'POST']).end();
     }
   } catch (error) {
-    console.error(error);
+    if (process.env.NODE_ENV !== 'production') {
+      console.error(error);
+    }
+    if (error instanceof HTTPResponseError) {
+      return res.status(error.statusCode).end();
+    }
     return res.status(500).end();
   }
 };

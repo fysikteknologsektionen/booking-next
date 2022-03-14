@@ -1,14 +1,14 @@
 import { Formik } from 'formik';
 import type { GetServerSideProps, NextPage } from 'next';
-import type { VenueDocument } from '@models/VenueModel';
-import type { UserDocument } from '@models/UserModel';
-import UserModel from '@models/UserModel';
-import DashboardLayout from '@components/DashboardLayout';
+import type { VenueDocument } from 'models/VenueModel';
+import type { UserDocument } from 'models/UserModel';
+import UserModel from 'models/UserModel';
+import DashboardLayout from 'components/DashboardLayout';
 import { useRouter } from 'next/router';
 import type { LeanDocument } from 'mongoose';
-import VenueForm from '@components/VenueForm';
+import VenueForm from 'components/VenueForm';
 import type { ParsedUrlQuery } from 'querystring';
-import { getVenue } from 'pages/api/venues/[id]';
+import VenueController from 'controllers/VenueController';
 
 interface Props {
   venue: LeanDocument<VenueDocument>;
@@ -24,7 +24,8 @@ export const getServerSideProps: GetServerSideProps<Props, Query> = async ({
 }) => {
   try {
     if (params?.id) {
-      const venue = await getVenue(params.id);
+      const venueController = new VenueController();
+      const venue = await venueController.get(params.id);
 
       const managers = await UserModel.find()
         .where('role')

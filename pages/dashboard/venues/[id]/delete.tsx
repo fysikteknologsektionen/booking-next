@@ -1,9 +1,9 @@
-import DashboardLayout from '@components/DashboardLayout';
-import type { VenueDocument } from '@models/VenueModel';
+import DashboardLayout from 'components/DashboardLayout';
+import type { VenueDocument } from 'models/VenueModel';
+import VenueController from 'controllers/VenueController';
 import type { LeanDocument } from 'mongoose';
 import type { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
-import { getVenue } from 'pages/api/venues/[id]';
 import type { ParsedUrlQuery } from 'querystring';
 
 interface Props {
@@ -19,7 +19,8 @@ export const getServerSideProps: GetServerSideProps<Props, Query> = async ({
 }) => {
   try {
     if (params?.id) {
-      const venue = await getVenue(params.id);
+      const venueController = new VenueController();
+      const venue = await venueController.get(params.id);
       return {
         props: {
           venue: JSON.parse(JSON.stringify(venue)),

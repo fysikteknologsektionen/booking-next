@@ -1,16 +1,17 @@
-import DashboardLayout from '@components/DashboardLayout';
-import type { VenueDocument } from '@models/VenueModel';
+import DashboardLayout from 'components/DashboardLayout';
+import type { VenueDocument } from 'models/VenueModel';
+import VenueController from 'controllers/VenueController';
 import type { LeanDocument } from 'mongoose';
 import type { GetServerSideProps, NextPage } from 'next';
 import Link from 'next/link';
-import { indexVenues } from 'pages/api/venues';
 
 interface Props {
   venues: LeanDocument<VenueDocument>[];
 }
 
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
-  const venues = await indexVenues();
+  const controller = new VenueController();
+  const venues = await controller.index();
 
   return {
     props: {

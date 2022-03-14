@@ -1,16 +1,17 @@
-import DashboardLayout from '@components/DashboardLayout';
-import type { UserDocument } from '@models/UserModel';
+import DashboardLayout from 'components/DashboardLayout';
+import type { UserDocument } from 'models/UserModel';
+import UserController from 'controllers/UserController';
 import type { LeanDocument } from 'mongoose';
 import type { GetServerSideProps, NextPage } from 'next';
 import Link from 'next/link';
-import { indexUsers } from 'pages/api/users';
 
 interface Props {
   users: LeanDocument<UserDocument>[];
 }
 
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
-  const users = await indexUsers();
+  const controller = new UserController();
+  const users = await controller.index();
 
   return {
     props: {

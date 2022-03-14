@@ -1,27 +1,8 @@
-import dbConnect from '@lib/dbConnect';
-import HTTPResponseError from '@lib/HTTPResponseError';
-import type { UserDocument } from '@models/UserModel';
-import UserModel from '@models/UserModel';
+import HTTPResponseError from 'lib/HTTPResponseError';
+import type { UserDocument } from 'models/UserModel';
+import UserController from 'controllers/UserController';
 import type { LeanDocument } from 'mongoose';
 import type { NextApiRequest, NextApiResponse } from 'next';
-
-export const getUser = async (id: string) => {
-  await dbConnect();
-  const user = await UserModel.findById(id).lean().exec();
-  if (!user) {
-    throw new HTTPResponseError(404, `User with id '${id}' not found.`);
-  }
-  return user;
-};
-
-export const deleteUser = async (id: string) => {
-  await dbConnect();
-  const user = await UserModel.findByIdAndDelete(id).lean().exec();
-  if (!user) {
-    throw new HTTPResponseError(404, `User with id '${id}' not found.`);
-  }
-  return user;
-};
 
 const handler = async (
   req: NextApiRequest,
@@ -30,12 +11,13 @@ const handler = async (
   // Get the query id, if it's for some reason an array of ids we select the first.
   const query = req.query;
   const id = typeof query.id === 'string' ? query.id : query.id[0];
+  const controller = new UserController();
   try {
     switch (req.method) {
       case 'GET':
-        return res.json(await getUser(id));
+        return res.json(await controller.get(id));
       case 'DELETE':
-        return res.json(await deleteUser(id));
+        return res.json(await controller.delete(id));
       default:
         return res.status(405).setHeader('Allow', ['GET', 'DELETE']).end();
     }
