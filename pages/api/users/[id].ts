@@ -1,8 +1,8 @@
-import HTTPResponseError from 'lib/HTTPResponseError';
 import type { UserDocument } from 'models/UserModel';
 import UserController from 'controllers/UserController';
 import type { LeanDocument } from 'mongoose';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import ApiRouter from 'lib/ApiRouter';
 
 const handler = async (
   req: NextApiRequest,
@@ -12,23 +12,17 @@ const handler = async (
   const query = req.query;
   const id = typeof query.id === 'string' ? query.id : query.id[0];
   const controller = new UserController();
-  try {
-    switch (req.method) {
-      case 'GET':
-        return res.json(await controller.get(id));
-      case 'DELETE':
-        return res.json(await controller.delete(id));
-      default:
-        return res.status(405).setHeader('Allow', ['GET', 'DELETE']).end();
-    }
-  } catch (error) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.error(error);
-    }
-    if (error instanceof HTTPResponseError) {
-      return res.status(error.statusCode).end();
-    }
-    return res.status(500).end();
+  const router = new ApiRouter(controller, res, ['GET', 'DELETE']);
+
+  switch (req.method) {
+    case 'GET':
+      await router.get(id);
+      break;
+    case 'DELETE':
+      await router.delete(id);
+      break;
+    default:
+      router.default();
   }
 };
 

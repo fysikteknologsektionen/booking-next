@@ -1,8 +1,8 @@
-import HTTPResponseError from 'lib/HTTPResponseError';
 import type { VenueDocument } from 'models/VenueModel';
 import VenueController from 'controllers/VenueController';
 import type { LeanDocument } from 'mongoose';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import ApiRouter from 'lib/ApiRouter';
 
 const handler = async (
   req: NextApiRequest,
@@ -11,23 +11,17 @@ const handler = async (
   >,
 ) => {
   const controller = new VenueController();
-  try {
-    switch (req.method) {
-      case 'GET':
-        return res.json(await controller.index());
-      case 'POST':
-        return res.json(await controller.create(req.body));
-      default:
-        return res.status(405).setHeader('Allow', ['GET', 'POST']).end();
-    }
-  } catch (error) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.error(error);
-    }
-    if (error instanceof HTTPResponseError) {
-      return res.status(error.statusCode).end();
-    }
-    return res.status(500).end();
+  const router = new ApiRouter(controller, res, ['GET', 'POST']);
+
+  switch (req.method) {
+    case 'GET':
+      await router.index();
+      break;
+    case 'POST':
+      await router.create(req.body);
+      break;
+    default:
+      router.default();
   }
 };
 
