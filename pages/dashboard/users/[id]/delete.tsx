@@ -20,7 +20,7 @@ export const getServerSideProps: GetServerSideProps<Props, Query> = async ({
   try {
     if (params?.id) {
       const controller = new UserController();
-      const user = await controller.delete(params.id);
+      const user = await controller.get(params.id);
       return {
         props: {
           user: JSON.parse(JSON.stringify(user)),
