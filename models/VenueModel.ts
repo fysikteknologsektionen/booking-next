@@ -4,6 +4,9 @@ import type {
 import { model, models, Schema } from 'mongoose';
 import type { UserDocument } from './UserModel';
 
+/**
+ * Venue data fields.
+ */
 export interface Venue {
   name: string;
   description?: string;
@@ -11,7 +14,15 @@ export interface Venue {
   enabled: boolean;
 }
 
+/**
+ * User document including instance methods.
+ */
 export interface VenueDocument extends Venue, Document {}
+
+/**
+ * Venue model including static methods.
+ */
+interface VenueModel extends Model<VenueDocument> {}
 
 const venueSchema = new Schema<VenueDocument>({
   name: {
@@ -32,6 +43,5 @@ const venueSchema = new Schema<VenueDocument>({
   },
 });
 
-const VenueModel = (models.Venue as Model<VenueDocument>) || model('Venue', venueSchema);
-
-export default VenueModel;
+export default (models.Venue as VenueModel)
+  || model<VenueDocument, VenueModel>('Venue', venueSchema);
