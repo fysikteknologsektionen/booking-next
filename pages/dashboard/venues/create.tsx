@@ -1,12 +1,12 @@
 import { Formik } from 'formik';
 import type { GetServerSideProps, NextPage } from 'next';
-import type { Venue } from '@models/VenueModel';
-import type { UserDocument } from '@models/UserModel';
-import UserModel from '@models/UserModel';
-import DashboardLayout from '@components/DashboardLayout';
+import type { Venue } from 'models/VenueModel';
+import type { UserDocument } from 'models/UserModel';
+import UserModel from 'models/UserModel';
+import DashboardLayout from 'components/DashboardLayout';
 import { useRouter } from 'next/router';
 import type { LeanDocument } from 'mongoose';
-import VenueForm from '@components/VenueForm';
+import VenueForm from 'components/VenueForm';
 
 interface Props {
   managers: LeanDocument<UserDocument>[];

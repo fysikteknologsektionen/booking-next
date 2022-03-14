@@ -1,4 +1,4 @@
-import type { UserDocument } from '@models/UserModel';
+import type { UserDocument } from 'models/UserModel';
 import { Field, Form } from 'formik';
 import type { LeanDocument } from 'mongoose';
 

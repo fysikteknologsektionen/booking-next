@@ -1,4 +1,4 @@
-import UserModel from '@models/UserModel';
+import UserModel from 'models/UserModel';
 import NextAuth from 'next-auth/next';
 import type { Provider } from 'next-auth/providers';
 import Credentials from 'next-auth/providers/credentials';
@@ -72,7 +72,7 @@ export default NextAuth({
 
       // The oauth client should be set up to only allow users within the organisation,
       // but as a sanity check we'll validate the email
-      if (!profile.email_verified || !profile.email?.endsWith('@ftek.se')) {
+      if (!profile.email_verified || !profile.email?.endsWith('ftek.se')) {
         return false; // Authentication unsuccessful
       }
 

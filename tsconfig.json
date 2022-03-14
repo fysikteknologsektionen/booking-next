@@ -14,12 +14,7 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "baseUrl": ".",
-    "paths": {
-      "@lib/*": ["lib/*"],
-      "@models/*": ["models/*"],
-      "@components/*": ["components/*"]
-    }
+    "baseUrl": "."
   },
   "include": ["next-env.d.ts", "additional.d.ts", "**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"]
