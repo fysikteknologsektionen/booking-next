@@ -49,6 +49,7 @@ if (NODE_ENV !== 'production') {
           { name: credentials?.username },
           userData,
           {
+            new: true,
             upsert: true,
           },
         );
