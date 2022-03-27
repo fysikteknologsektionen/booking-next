@@ -1,32 +1,33 @@
-import type { VenueDocument } from 'models/VenueModel';
 import VenueController from 'controllers/VenueController';
-import type { LeanDocument } from 'mongoose';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import ApiRouter from 'lib/ApiRouter';
+import nc from 'next-connect';
+import handleApiError from 'lib/handleApiError';
+import type { VenueDocument } from 'models/VenueModel';
+import type { LeanDocument } from 'mongoose';
+import parseId from 'lib/middlewares/parseId';
 
-const handler = async (
-  req: NextApiRequest,
-  res: NextApiResponse<LeanDocument<VenueDocument>>,
-) => {
-  // Get the query id, if it's for some reason an array of ids we select the first.
-  const query = req.query;
-  const id = typeof query.id === 'string' ? query.id : query.id[0];
-  const controller = new VenueController();
-  const router = new ApiRouter(controller, res, ['GET', 'DELETE', 'PUT']);
+type Response = LeanDocument<VenueDocument> | string;
 
-  switch (req.method) {
-    case 'GET':
-      await router.get(id);
-      break;
-    case 'DELETE':
-      await router.delete(id);
-      break;
-    case 'PUT':
-      await router.update(id, req.body);
-      break;
-    default:
-      router.default();
-  }
-};
+const controller = new VenueController();
+
+const handler = nc<NextApiRequest, NextApiResponse<Response>>({
+  onError: handleApiError,
+  onNoMatch: (req, res) => {
+    res
+      .status(405)
+      .setHeader('Allow', ['GET', 'DELETE', 'PUT'])
+      .send('Method Not Allowed');
+  },
+})
+  .use(parseId)
+  .get<{ id: string }>(async (req, res) => {
+  res.json(await controller.get(req.id));
+})
+  .delete<{ id: string }>(async (req, res) => {
+  res.json(await controller.delete(req.id));
+})
+  .put<{ id: string }>(async (req, res) => {
+  res.json(await controller.update(req.id, req.body));
+});
 
 export default handler;

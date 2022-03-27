@@ -1,28 +1,28 @@
-import type { VenueDocument } from 'models/VenueModel';
 import VenueController from 'controllers/VenueController';
-import type { LeanDocument } from 'mongoose';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import ApiRouter from 'lib/ApiRouter';
+import nc from 'next-connect';
+import handleApiError from 'lib/handleApiError';
+import type { LeanDocument } from 'mongoose';
+import type { VenueDocument } from 'models/VenueModel';
 
-const handler = async (
-  req: NextApiRequest,
-  res: NextApiResponse<
-  LeanDocument<VenueDocument> | LeanDocument<VenueDocument>[]
-  >,
-) => {
-  const controller = new VenueController();
-  const router = new ApiRouter(controller, res, ['GET', 'POST']);
+type Response = LeanDocument<VenueDocument> | LeanDocument<VenueDocument>[] | string;
 
-  switch (req.method) {
-    case 'GET':
-      await router.index();
-      break;
-    case 'POST':
-      await router.create(req.body);
-      break;
-    default:
-      router.default();
-  }
-};
+const controller = new VenueController();
+
+const handler = nc<NextApiRequest, NextApiResponse<Response>>({
+  onError: handleApiError,
+  onNoMatch: (req, res) => {
+    res
+      .status(405)
+      .setHeader('Allow', ['GET', 'POST'])
+      .send('Method Not Allowed');
+  },
+})
+  .get(async (req, res) => {
+    res.json(await controller.index());
+  })
+  .post(async (req, res) => {
+    res.json(await controller.create(req.body));
+  });
 
 export default handler;

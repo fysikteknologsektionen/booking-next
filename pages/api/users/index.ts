@@ -1,23 +1,21 @@
-import type { UserDocument } from 'models/UserModel';
-import UserController from 'controllers/UserController';
-import type { LeanDocument } from 'mongoose';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import ApiRouter from 'lib/ApiRouter';
+import nc from 'next-connect';
+import handleApiError from 'lib/handleApiError';
+import type { LeanDocument } from 'mongoose';
+import UserController from 'controllers/UserController';
+import type { UserDocument } from 'models/UserModel';
 
-const handler = async (
-  req: NextApiRequest,
-  res: NextApiResponse<LeanDocument<UserDocument>[]>,
-) => {
-  const controller = new UserController();
-  const router = new ApiRouter(controller, res, ['GET']);
+type Response = LeanDocument<UserDocument>[] | string;
 
-  switch (req.method) {
-    case 'GET':
-      await router.index();
-      break;
-    default:
-      router.default();
-  }
-};
+const controller = new UserController();
+
+const handler = nc<NextApiRequest, NextApiResponse<Response>>({
+  onError: handleApiError,
+  onNoMatch: (req, res) => {
+    res.status(405).setHeader('Allow', ['GET']).send('Method Not Allowed');
+  },
+}).get(async (req, res) => {
+  res.json(await controller.index());
+});
 
 export default handler;
