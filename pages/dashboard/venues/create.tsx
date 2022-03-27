@@ -1,27 +1,25 @@
 import { Formik } from 'formik';
 import type { GetServerSideProps, NextPage } from 'next';
-import type { Venue } from 'models/VenueModel';
-import type { UserDocument } from 'models/UserModel';
-import UserModel from 'models/UserModel';
 import DashboardLayout from 'components/DashboardLayout';
 import { useRouter } from 'next/router';
-import type { LeanDocument } from 'mongoose';
 import VenueForm from 'components/VenueForm';
+import type { Venue } from 'src/models/VenueModel';
+import type { User } from 'src/models/UserModel';
+import UserService from 'src/services/UserService';
 
 interface Props {
-  managers: LeanDocument<UserDocument>[];
+  managers: (User & { _id: string })[];
 }
 
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
-  const managers = await UserModel.find()
-    .where('role')
-    .in(['manager', 'admin'])
-    .lean()
-    .exec();
+  const service = new UserService();
+
+  // TODO: Update with query filtering
+  const managers = await service.listUsers();
 
   return {
     props: {
-      managers,
+      managers: JSON.parse(JSON.stringify(managers)),
     },
   };
 };

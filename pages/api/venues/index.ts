@@ -1,28 +1,14 @@
-import VenueController from 'controllers/VenueController';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-import handleApiError from 'lib/handleApiError';
-import type { LeanDocument } from 'mongoose';
-import type { VenueDocument } from 'models/VenueModel';
+import baseNextConnect from 'src/lib/baseNextConnect';
+import VenueService from 'src/services/VenueService';
 
-type Response = LeanDocument<VenueDocument> | LeanDocument<VenueDocument>[] | string;
+const service = new VenueService();
 
-const controller = new VenueController();
-
-const handler = nc<NextApiRequest, NextApiResponse<Response>>({
-  onError: handleApiError,
-  onNoMatch: (req, res) => {
-    res
-      .status(405)
-      .setHeader('Allow', ['GET', 'POST'])
-      .send('Method Not Allowed');
-  },
-})
-  .get(async (req, res) => {
-    res.json(await controller.index());
-  })
+const handler = baseNextConnect(['POST', 'GET'])
   .post(async (req, res) => {
-    res.json(await controller.create(req.body));
+    res.json(await service.createVenue(req.body));
+  })
+  .get(async (req, res) => {
+    res.json(await service.listVenues());
   });
 
 export default handler;

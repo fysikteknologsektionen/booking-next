@@ -1,18 +1,17 @@
 import { Formik } from 'formik';
 import type { GetServerSideProps, NextPage } from 'next';
-import type { VenueDocument } from 'models/VenueModel';
-import type { UserDocument } from 'models/UserModel';
-import UserModel from 'models/UserModel';
 import DashboardLayout from 'components/DashboardLayout';
 import { useRouter } from 'next/router';
-import type { LeanDocument } from 'mongoose';
 import VenueForm from 'components/VenueForm';
 import type { ParsedUrlQuery } from 'querystring';
-import VenueController from 'controllers/VenueController';
+import type { Venue } from 'src/models/VenueModel';
+import type { User } from 'src/models/UserModel';
+import VenueService from 'src/services/VenueService';
+import UserService from 'src/services/UserService';
 
 interface Props {
-  venue: LeanDocument<VenueDocument>;
-  managers: LeanDocument<UserDocument>[];
+  venue: Venue & { _id: string };
+  managers: (User & { _id: string })[];
 }
 
 interface Query extends ParsedUrlQuery {
@@ -22,31 +21,25 @@ interface Query extends ParsedUrlQuery {
 export const getServerSideProps: GetServerSideProps<Props, Query> = async ({
   params,
 }) => {
-  try {
-    if (params?.id) {
-      const venueController = new VenueController();
-      const venue = await venueController.get(params.id);
-
-      const managers = await UserModel.find()
-        .where('role')
-        .in(['manager', 'admin'])
-        .lean()
-        .exec();
-
-      return {
-        props: {
-          venue: JSON.parse(JSON.stringify(venue)),
-          managers: JSON.parse(JSON.stringify(managers)),
-        },
-      };
-    }
-  } catch (error) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.error(error);
-    }
+  if (!params?.id) {
+    return {
+      notFound: true,
+    };
   }
+
+  // TODO: Handle 404 errors
+  const venueService = new VenueService();
+  const venue = await venueService.getVenue(params.id);
+
+  // TODO: Update with query filtering
+  const userService = new UserService();
+  const managers = await userService.listUsers();
+
   return {
-    notFound: true,
+    props: {
+      venue: JSON.parse(JSON.stringify(venue)),
+      managers: JSON.parse(JSON.stringify(managers)),
+    },
   };
 };
 

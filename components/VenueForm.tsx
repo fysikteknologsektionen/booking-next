@@ -1,11 +1,10 @@
-import type { UserDocument } from 'models/UserModel';
 import { Field, Form } from 'formik';
-import type { LeanDocument } from 'mongoose';
+import type { User } from 'src/models/UserModel';
 
 interface Props {
   isSubmitting: boolean;
   status: any;
-  managers: LeanDocument<UserDocument>[];
+  managers: (User & { _id: string })[];
   submitButtonText: string;
 }
 
@@ -29,7 +28,7 @@ const VenueForm: React.VFC<Props> = ({
     </label>
     <Field as="select" multiple id="managers" name="managers">
       {managers.map((manager) => (
-        <option key={manager.id} value={manager.id}>
+        <option key={manager._id} value={manager._id}>
           {manager.email}
         </option>
       ))}

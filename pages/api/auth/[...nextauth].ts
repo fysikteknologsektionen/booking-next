@@ -1,9 +1,9 @@
-import UserModel from 'models/UserModel';
+import UserModel from 'src/models/UserModel';
 import NextAuth from 'next-auth/next';
 import type { Provider } from 'next-auth/providers';
 import Credentials from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
-import dbConnect from '../../../lib/dbConnect';
+import dbConnect from 'src/lib/dbConnect';
 
 const OAUTH_CLIENT_ID = process.env.OAUTH_CLIENT_ID;
 const OAUTH_CLIENT_SECRET = process.env.OAUTH_CLIENT_SECRET;

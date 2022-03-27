@@ -1,13 +1,12 @@
 import DashboardLayout from 'components/DashboardLayout';
-import UserController from 'controllers/UserController';
-import type { UserDocument } from 'models/UserModel';
-import type { LeanDocument } from 'mongoose';
 import type { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import type { ParsedUrlQuery } from 'querystring';
+import type { User } from 'src/models/UserModel';
+import UserService from 'src/services/UserService';
 
 interface Props {
-  user: LeanDocument<UserDocument>;
+  user: User & { _id: string };
 }
 
 interface Query extends ParsedUrlQuery {
@@ -17,23 +16,20 @@ interface Query extends ParsedUrlQuery {
 export const getServerSideProps: GetServerSideProps<Props, Query> = async ({
   params,
 }) => {
-  try {
-    if (params?.id) {
-      const controller = new UserController();
-      const user = await controller.get(params.id);
-      return {
-        props: {
-          user: JSON.parse(JSON.stringify(user)),
-        },
-      };
-    }
-  } catch (error) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.error(error);
-    }
+  if (!params?.id) {
+    return {
+      notFound: true,
+    };
   }
+
+  // TODO: Handle 404 errors
+  const service = new UserService();
+  const user = service.getUser(params.id);
+
   return {
-    notFound: true,
+    props: {
+      user: JSON.parse(JSON.stringify(user)),
+    },
   };
 };
 

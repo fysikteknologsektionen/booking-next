@@ -1,24 +1,23 @@
-import dbConnect from 'lib/dbConnect';
-import getWhitelistedEntries from 'lib/getWhitelistedEntries';
-import HTTPResponseError from 'lib/HTTPResponseError';
+import dbConnect from 'src/lib/dbConnect';
+import getWhitelistedEntries from 'src/lib/getWhitelistedEntries';
+import HTTPResponseError from 'src/lib/HTTPResponseError';
 import type {
   Connection,
-  Document,
   HydratedDocument,
   LeanDocument,
   Model,
 } from 'mongoose';
 
 /**
- * Abstract controller for handling CRUD operations
- * @template T The document type.
+ * Abstract repository for handling data access
+ * @template T The data resource type
  */
-export default abstract class AbstractController<T extends Document> {
-  Model: Model<T>;
+export default abstract class AbstractRepository<T> {
+  private Model: Model<T>;
 
-  attributes: string[];
+  private attributes: string[];
 
-  connection: Promise<Connection | null>;
+  private connection: Promise<Connection | null>;
 
   /**
    *
@@ -36,7 +35,7 @@ export default abstract class AbstractController<T extends Document> {
    * @param body Request body.
    * @returns The new document.
    */
-  async create(body: Record<string, any>): Promise<HydratedDocument<T>> {
+  public async create(body: Record<string, any>): Promise<HydratedDocument<T>> {
     await this.connection;
     const data = getWhitelistedEntries(body, this.attributes);
     const doc = new this.Model(data);
@@ -48,10 +47,12 @@ export default abstract class AbstractController<T extends Document> {
    * Indexes documents.
    * @returns Array of documents.
    */
-  async index(): Promise<LeanDocument<T>[]> {
+  public async index(): Promise<LeanDocument<HydratedDocument<T>>[]> {
     await this.connection;
     // Types to lean() don't get inferred correctly so we explicitly type it
-    const docs = await this.Model.find().lean<LeanDocument<T>[]>().exec();
+    const docs = await this.Model.find()
+      .lean<LeanDocument<HydratedDocument<T>>[]>()
+      .exec();
     return docs;
   }
 
@@ -60,10 +61,10 @@ export default abstract class AbstractController<T extends Document> {
    * @param id The document id.
    * @returns The specified document.
    */
-  async get(id: string): Promise<LeanDocument<T>> {
+  public async get(id: string): Promise<LeanDocument<HydratedDocument<T>>> {
     await this.connection;
     const doc = await this.Model.findById(id)
-      .lean<LeanDocument<T> | null>()
+      .lean<LeanDocument<HydratedDocument<T>> | null>()
       .exec();
     if (!doc) {
       throw new HTTPResponseError(
@@ -74,11 +75,14 @@ export default abstract class AbstractController<T extends Document> {
     return doc;
   }
 
-  async update(id: string, body: Record<string, any>) {
+  public async update(
+    id: string,
+    body: Record<string, any>,
+  ): Promise<LeanDocument<HydratedDocument<T>>> {
     await this.connection;
     const data = getWhitelistedEntries(body, this.attributes);
     const venue = await this.Model.findByIdAndUpdate(id, data, { new: true })
-      .lean<LeanDocument<T> | null>()
+      .lean<LeanDocument<HydratedDocument<T>> | null>()
       .exec();
     if (!venue) {
       throw new HTTPResponseError(
@@ -94,10 +98,10 @@ export default abstract class AbstractController<T extends Document> {
    * @param id The document id.
    * @returns The deleted document.
    */
-  async delete(id: string): Promise<LeanDocument<T>> {
+  public async delete(id: string): Promise<LeanDocument<HydratedDocument<T>>> {
     await this.connection;
     const doc = await this.Model.findByIdAndDelete(id)
-      .lean<LeanDocument<T> | null>()
+      .lean<LeanDocument<HydratedDocument<T>> | null>()
       .exec();
     if (!doc) {
       throw new HTTPResponseError(

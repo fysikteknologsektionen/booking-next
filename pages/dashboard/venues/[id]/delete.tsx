@@ -1,13 +1,12 @@
 import DashboardLayout from 'components/DashboardLayout';
-import type { VenueDocument } from 'models/VenueModel';
-import VenueController from 'controllers/VenueController';
-import type { LeanDocument } from 'mongoose';
 import type { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import type { ParsedUrlQuery } from 'querystring';
+import type { Venue } from 'src/models/VenueModel';
+import VenueService from 'src/services/VenueService';
 
 interface Props {
-  venue: LeanDocument<VenueDocument>;
+  venue: Venue & { _id: string };
 }
 
 interface Query extends ParsedUrlQuery {
@@ -17,23 +16,20 @@ interface Query extends ParsedUrlQuery {
 export const getServerSideProps: GetServerSideProps<Props, Query> = async ({
   params,
 }) => {
-  try {
-    if (params?.id) {
-      const venueController = new VenueController();
-      const venue = await venueController.get(params.id);
-      return {
-        props: {
-          venue: JSON.parse(JSON.stringify(venue)),
-        },
-      };
-    }
-  } catch (error) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.error(error);
-    }
+  if (!params?.id) {
+    return {
+      notFound: true,
+    };
   }
+
+  // TODO: Handle 404 errors
+  const service = new VenueService();
+  const venue = await service.getVenue(params.id);
+
   return {
-    notFound: true,
+    props: {
+      venue: JSON.parse(JSON.stringify(venue)),
+    },
   };
 };
 
