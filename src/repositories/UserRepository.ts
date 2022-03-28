@@ -1,8 +1,8 @@
 import type { User } from 'src/models/UserModel';
 import UserModel from 'src/models/UserModel';
-import AbstractRespository from './AbstractRepository';
+import BaseRepository from './BaseRepository';
 
-export default class UserRepository extends AbstractRespository<User> {
+export default class UserRepository extends BaseRepository<User> {
   constructor() {
     super(UserModel, ['role']);
   }

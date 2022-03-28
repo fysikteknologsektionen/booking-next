@@ -1,8 +1,8 @@
 import type { Venue } from 'src/models/VenueModel';
 import VenueModel from 'src/models/VenueModel';
-import AbstractRepository from './AbstractRepository';
+import BaseRepository from './BaseRepository';
 
-export default class VenueRepository extends AbstractRepository<Venue> {
+export default class VenueRepository extends BaseRepository<Venue> {
   constructor() {
     super(VenueModel, ['name', 'description', 'managers', 'enabled']);
   }

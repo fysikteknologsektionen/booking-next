@@ -8,25 +8,24 @@ import type {
   Model,
 } from 'mongoose';
 
-/**
- * Abstract repository for handling data access
- * @template T The data resource type
- */
-export default abstract class AbstractRepository<T> {
+type LeanDocumentType<T> = LeanDocument<HydratedDocument<T>>;
+
+/** Class representing a base repository  */
+export default class BaseRepository<T extends Record<string, any>> {
   private Model: Model<T>;
 
-  private attributes: string[];
+  private whitelistedProperties: string[];
 
-  private connection: Promise<Connection | null>;
+  private connection: Promise<Connection>;
 
   /**
-   *
+   * Create a BaseRepository
    * @param Model The underlying mongoose model
-   * @param attributes List of attributes available when creating/editing corresponding document
+   * @param whitelistedProperties List of whitelisted attributes for creating/editing documents
    */
-  constructor(Model: Model<T>, attributes: string[]) {
+  constructor(Model: Model<T>, whitelistedProperties: string[]) {
     this.Model = Model;
-    this.attributes = attributes;
+    this.whitelistedProperties = whitelistedProperties;
     this.connection = dbConnect();
   }
 
@@ -37,7 +36,7 @@ export default abstract class AbstractRepository<T> {
    */
   public async create(body: Record<string, any>): Promise<HydratedDocument<T>> {
     await this.connection;
-    const data = getWhitelistedEntries(body, this.attributes);
+    const data = getWhitelistedEntries(body, this.whitelistedProperties);
     const doc = new this.Model(data);
     await doc.save();
     return doc;
@@ -47,12 +46,9 @@ export default abstract class AbstractRepository<T> {
    * Indexes documents.
    * @returns Array of documents.
    */
-  public async index(): Promise<LeanDocument<HydratedDocument<T>>[]> {
+  public async index(): Promise<LeanDocumentType<T>[]> {
     await this.connection;
-    // Types to lean() don't get inferred correctly so we explicitly type it
-    const docs = await this.Model.find()
-      .lean<LeanDocument<HydratedDocument<T>>[]>()
-      .exec();
+    const docs = await this.Model.find().lean<LeanDocumentType<T>[]>().exec();
     return docs;
   }
 
@@ -61,10 +57,10 @@ export default abstract class AbstractRepository<T> {
    * @param id The document id.
    * @returns The specified document.
    */
-  public async get(id: string): Promise<LeanDocument<HydratedDocument<T>>> {
+  public async get(id: string): Promise<LeanDocumentType<T>> {
     await this.connection;
     const doc = await this.Model.findById(id)
-      .lean<LeanDocument<HydratedDocument<T>> | null>()
+      .lean<LeanDocumentType<T> | null>()
       .exec();
     if (!doc) {
       throw new HTTPResponseError(
@@ -78,19 +74,19 @@ export default abstract class AbstractRepository<T> {
   public async update(
     id: string,
     body: Record<string, any>,
-  ): Promise<LeanDocument<HydratedDocument<T>>> {
+  ): Promise<LeanDocumentType<T>> {
     await this.connection;
-    const data = getWhitelistedEntries(body, this.attributes);
-    const venue = await this.Model.findByIdAndUpdate(id, data, { new: true })
-      .lean<LeanDocument<HydratedDocument<T>> | null>()
+    const data = getWhitelistedEntries(body, this.whitelistedProperties);
+    const doc = await this.Model.findByIdAndUpdate(id, data, { new: true })
+      .lean<LeanDocumentType<T> | null>()
       .exec();
-    if (!venue) {
+    if (!doc) {
       throw new HTTPResponseError(
         404,
         `${this.Model.name} with id '${id}' not found.`,
       );
     }
-    return venue;
+    return doc;
   }
 
   /**
@@ -98,10 +94,10 @@ export default abstract class AbstractRepository<T> {
    * @param id The document id.
    * @returns The deleted document.
    */
-  public async delete(id: string): Promise<LeanDocument<HydratedDocument<T>>> {
+  public async delete(id: string): Promise<LeanDocumentType<T>> {
     await this.connection;
     const doc = await this.Model.findByIdAndDelete(id)
-      .lean<LeanDocument<HydratedDocument<T>> | null>()
+      .lean<LeanDocumentType<T>>()
       .exec();
     if (!doc) {
       throw new HTTPResponseError(

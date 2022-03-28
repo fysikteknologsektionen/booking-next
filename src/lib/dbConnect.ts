@@ -1,7 +1,5 @@
 import mongoose from 'mongoose';
 
-const DB_CONNECTION_STRING = process.env.DB_CONNECTION_STRING;
-
 let cached = global.mongoose;
 
 if (!cached) {
@@ -23,16 +21,22 @@ export default async function dbConnect() {
       bufferCommands: false,
     };
 
+    const DB_CONNECTION_STRING = process.env.DB_CONNECTION_STRING;
+
     if (!DB_CONNECTION_STRING) {
       throw new Error(
-        'Please set the DB_CONNECTION_STRING environment variables inside .env.local',
+        'Environment variable "DB_CONNECTION_STRING" is not set. Please set it.',
       );
     }
 
-    cached.promise = mongoose
-      .connect(DB_CONNECTION_STRING, opts)
-      .then((conn) => conn);
+    cached.promise = mongoose.connect(DB_CONNECTION_STRING, opts);
   }
+
   cached.conn = await cached.promise;
+
+  if (!cached.conn) {
+    throw new Error('Unable to connect to MongoDB.');
+  }
+
   return cached.conn;
 }
