@@ -1,5 +1,4 @@
 import dbConnect from 'src/lib/dbConnect';
-import getWhitelistedEntries from 'src/lib/getWhitelistedEntries';
 import HTTPResponseError from 'src/lib/HTTPResponseError';
 import type {
   Connection,
@@ -14,18 +13,16 @@ type LeanDocumentType<T> = LeanDocument<HydratedDocument<T>>;
 export default class BaseRepository<T extends Record<string, any>> {
   private Model: Model<T>;
 
-  private whitelistedProperties: string[];
-
   private connection: Promise<Connection>;
 
   /**
    * Create a BaseRepository
-   * @param Model The underlying mongoose model
-   * @param whitelistedProperties List of whitelisted attributes for creating/editing documents
+   * @param Model The underlying mongoose model.
    */
-  constructor(Model: Model<T>, whitelistedProperties: string[]) {
+  constructor(
+    Model: Model<T>,
+  ) {
     this.Model = Model;
-    this.whitelistedProperties = whitelistedProperties;
     this.connection = dbConnect();
   }
 
@@ -34,11 +31,12 @@ export default class BaseRepository<T extends Record<string, any>> {
    * @param body Request body.
    * @returns The new document.
    */
-  public async create(body: Record<string, any>): Promise<HydratedDocument<T>> {
+  public async create(data: Record<string, any>): Promise<HydratedDocument<T>> {
     await this.connection;
-    const data = getWhitelistedEntries(body, this.whitelistedProperties);
+
     const doc = new this.Model(data);
     await doc.save();
+
     return doc;
   }
 
@@ -48,7 +46,9 @@ export default class BaseRepository<T extends Record<string, any>> {
    */
   public async index(): Promise<LeanDocumentType<T>[]> {
     await this.connection;
+
     const docs = await this.Model.find().lean<LeanDocumentType<T>[]>().exec();
+
     return docs;
   }
 
@@ -59,33 +59,39 @@ export default class BaseRepository<T extends Record<string, any>> {
    */
   public async get(id: string): Promise<LeanDocumentType<T>> {
     await this.connection;
+
     const doc = await this.Model.findById(id)
       .lean<LeanDocumentType<T> | null>()
       .exec();
+
     if (!doc) {
       throw new HTTPResponseError(
         404,
         `${this.Model.name} with id '${id}' not found.`,
       );
     }
+
     return doc;
   }
 
   public async update(
     id: string,
-    body: Record<string, any>,
-  ): Promise<LeanDocumentType<T>> {
+    data: Record<string, any>,
+  ): Promise<HydratedDocument<T>> {
     await this.connection;
-    const data = getWhitelistedEntries(body, this.whitelistedProperties);
-    const doc = await this.Model.findByIdAndUpdate(id, data, { new: true })
-      .lean<LeanDocumentType<T> | null>()
-      .exec();
+
+    const doc = await this.Model.findById(id);
+
     if (!doc) {
       throw new HTTPResponseError(
         404,
         `${this.Model.name} with id '${id}' not found.`,
       );
     }
+
+    doc.set(data);
+    await doc.save();
+
     return doc;
   }
 
@@ -96,15 +102,18 @@ export default class BaseRepository<T extends Record<string, any>> {
    */
   public async delete(id: string): Promise<LeanDocumentType<T>> {
     await this.connection;
+
     const doc = await this.Model.findByIdAndDelete(id)
       .lean<LeanDocumentType<T>>()
       .exec();
+
     if (!doc) {
       throw new HTTPResponseError(
         404,
         `${this.Model.name} with id '${id}' not found.`,
       );
     }
+
     return doc;
   }
 }

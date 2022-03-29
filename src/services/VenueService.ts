@@ -1,10 +1,12 @@
-import VenueRepository from 'src/repositories/VenueRepository';
+import type { Venue } from 'src/models/VenueModel';
+import VenueModel from 'src/models/VenueModel';
+import BaseRepository from 'src/repositories/BaseRepository';
 
 export default class VenueService {
-  private repository: VenueRepository;
+  private repository: BaseRepository<Venue>;
 
   constructor() {
-    this.repository = new VenueRepository();
+    this.repository = new BaseRepository(VenueModel);
   }
 
   public async createVenue(body: Record<string, any>) {

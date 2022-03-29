@@ -1,10 +1,12 @@
-import UserRepository from 'src/repositories/UserRepository';
+import type { User } from 'src/models/UserModel';
+import UserModel from 'src/models/UserModel';
+import BaseRepository from 'src/repositories/BaseRepository';
 
 export default class UserService {
-  private repository: UserRepository;
+  private repository: BaseRepository<User>;
 
   constructor() {
-    this.repository = new UserRepository();
+    this.repository = new BaseRepository(UserModel);
   }
 
   public async listUsers() {
