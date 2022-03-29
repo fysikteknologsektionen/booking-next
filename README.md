@@ -1,34 +1,29 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Dependencies
+* Node.js (^16.x.x)
+* MongoDB (^5.x.x) - might work with ~4.4.x but this hasn't been tested
 
-## Getting Started
-
-First, run the development server:
-
+## Installation
+You can install all project dependencies by running
 ```bash
-npm run dev
-# or
-yarn dev
+npm install
 ```
+## Configuration
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Google OAuth 2.0
+This project uses OAuth 2.0 with Google as provider for user authentication. For this you work you must first [set up credentials](https://support.google.com/cloud/answer/6158849?hl=en), with the following configuration:
+* Application type: `Web Application`
+* Authorized JavaScript origins: `<full application URL>`
+* Authorized redirect URIs: `<full application URL>/api/auth/callback/google`
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+The first time you set up OAuth 2.0 credentials you will also have to set up the consent screen. For the app to fully work, you must include the `userinfo.email`, `userinfo.profile` and `openid` scopes when doing so.
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+## Contributing
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+### Devcontainer
+The project includes a [devcontainer](https://code.visualstudio.com/docs/remote/create-dev-container) configuration which contains all dependencies. To use this you need to install Docker (either CLI or [Docker Desktop](https://www.docker.com/products/docker-desktop/)), and the [remote development extension pack](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.vscode-remote-extensionpack) after which you can simply select "Clone Repository in Container Volume..." from the Remote Explorer tab.
 
-## Learn More
+### Configuration
+The project comes with a `.env.development` file which contains defaults that should be sufficient for most development needs. If you need to add or change values, it's best to do so in a new `.env.development.local` file which will overwrite the defaults. This way you don't accidentally include the updated configuration in a git commit.
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+### Setting up OAuth 2.0
+The application includes a simple credentials provider when `NODE_ENV` is set to `production`, which can be used for most front-end and some back-end development needs. To set up an environment more similar to what is used in production, OAuth 2.0 credentials has to be set up. To do this, follow the [section on setting up Google OAuth 2.0](#google-oauth-20) and use `http://localhost:3000` as the application URL.
