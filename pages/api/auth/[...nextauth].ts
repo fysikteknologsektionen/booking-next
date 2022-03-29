@@ -1,26 +1,27 @@
-import UserModel from 'src/models/UserModel';
+import UserModel, { UserRole } from 'src/models/UserModel';
 import NextAuth from 'next-auth/next';
 import type { Provider } from 'next-auth/providers';
 import Credentials from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
 import dbConnect from 'src/lib/dbConnect';
 
-const OAUTH_CLIENT_ID = process.env.OAUTH_CLIENT_ID;
-const OAUTH_CLIENT_SECRET = process.env.OAUTH_CLIENT_SECRET;
+const GOOGLE_OAUTH_CLIENT_ID = process.env.GOOGLE_OAUTH_CLIENT_ID;
+const GOOGLE_OAUTH_CLIENT_SECRET = process.env.GOOGLE_OAUTH_CLIENT_SECRET;
 const SECRET = process.env.NEXTAUTH_SECRET;
 const NODE_ENV = process.env.NODE_ENV;
 
-if (!OAUTH_CLIENT_ID || !OAUTH_CLIENT_SECRET || !SECRET) {
+if (!GOOGLE_OAUTH_CLIENT_ID || !GOOGLE_OAUTH_CLIENT_SECRET || !SECRET) {
   throw new Error(
-    'Please set the OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET and NEXTAUTH_SECRET environment variables inside .env.local',
+    `One or more of environment variables "GOOGLE_OAUTH_CLIENT_ID",
+    "GOOGLE_OAUTH_CLIENT_SECRET" or "NEXTAUTH_SECRET" are not set. Please set them.`,
   );
 }
 
 // The default google provider
 const providers: Provider[] = [
   GoogleProvider({
-    clientId: OAUTH_CLIENT_ID,
-    clientSecret: OAUTH_CLIENT_SECRET,
+    clientId: GOOGLE_OAUTH_CLIENT_ID,
+    clientSecret: GOOGLE_OAUTH_CLIENT_SECRET,
   }),
 ];
 
@@ -34,19 +35,22 @@ if (NODE_ENV !== 'production') {
         username: { label: 'Username', type: 'text' },
       },
       async authorize(credentials) {
+        if (!credentials) {
+          return null;
+        }
+
         await dbConnect();
 
         // Dummy data
         const userData = {
           email: 'foo@bar.com',
           googleId: Date.now().toString(),
+          role: UserRole.ADMIN,
         };
 
-        // Upsert user (note that we filter on name -- this is not consistent with how we actually
-        // intend to use this is in production, but rather a result of having no consistent googleId
-        // when developing without oauth).
+        // Upsert user
         const user = await UserModel.findOneAndUpdate(
-          { name: credentials?.username },
+          { name: credentials.username },
           userData,
           {
             new: true,
@@ -74,7 +78,7 @@ export default NextAuth({
       // The oauth client should be set up to only allow users within the organisation,
       // but as a sanity check we'll validate the email
       if (!profile.email_verified || !profile.email?.endsWith('ftek.se')) {
-        return false; // Authentication unsuccessful
+        return false;
       }
 
       await dbConnect();
@@ -92,7 +96,7 @@ export default NextAuth({
         upsert: true,
       });
 
-      return true; // Authentication successful
+      return true;
     },
   },
 });
