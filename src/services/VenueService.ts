@@ -1,31 +1,40 @@
-import type { Venue } from 'src/models/VenueModel';
+import type { Ability } from '@casl/ability';
+import { ForbiddenError } from '@casl/ability';
 import VenueModel from 'src/models/VenueModel';
-import BaseRepository from 'src/repositories/BaseRepository';
+import { pick } from 'lodash';
+import dbConnect from 'src/lib/dbConnect';
 
-export default class VenueService {
-  private repository: BaseRepository<Venue>;
+/**
+ * Creates a new venue.
+ * @param ability Requesting user's ability.
+ * @param data The new venue data.
+ * @returns New venue.
+ */
+export async function createVenue(ability: Ability, data: Record<string, any>) {
+  ForbiddenError.from(ability).throwUnlessCan('create', 'Venue');
+  await dbConnect();
+  const venue = new VenueModel(data);
+  await venue.save();
+  return venue;
+}
 
-  constructor() {
-    this.repository = new BaseRepository(VenueModel);
-  }
+/**
+ * Lists all venues.
+ * @param ability Requesting user's ability.
+ * @returns Array of venues.
+ */
+export async function listVenues(ability: Ability) {
+  await dbConnect();
+  const venues = await VenueModel.accessibleBy(ability).find().exec();
+  return venues.map((venue) => pick(venue, venue.accessibleFieldsBy(ability)));
+}
 
-  public async createVenue(body: Record<string, any>) {
-    return this.repository.create(body);
-  }
-
-  public async listVenues() {
-    return this.repository.index();
-  }
-
-  public async getVenue(id: string) {
-    return this.repository.get(id);
-  }
-
-  public async updateVenue(id: string, body: Record<string, any>) {
-    return this.repository.update(id, body);
-  }
-
-  public async deleteVenue(id: string) {
-    return this.repository.delete(id);
-  }
+export async function getVenueById(ability: Ability, id: string) {
+  await dbConnect();
+  // findById isn't included in QueryWithHelpers interface for unknown reason so use findOne instead
+  const venue = await VenueModel.accessibleBy(ability)
+    .findOne({ _id: id })
+    .orFail()
+    .exec();
+  return pick(venue, venue.accessibleFieldsBy(ability));
 }

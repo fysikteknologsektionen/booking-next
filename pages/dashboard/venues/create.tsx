@@ -5,18 +5,16 @@ import { useRouter } from 'next/router';
 import VenueForm from 'components/VenueForm';
 import type { Venue } from 'src/models/VenueModel';
 import type { User } from 'src/models/UserModel';
-import UserService from 'src/services/UserService';
+import { listManagers } from 'src/services/UserService';
+import defineAbility from 'src/lib/defineAbility';
 
 interface Props {
   managers: (User & { _id: string })[];
 }
 
-export const getServerSideProps: GetServerSideProps<Props> = async () => {
-  const service = new UserService();
-
-  // TODO: Update with query filtering
-  const managers = await service.listUsers();
-
+export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => {
+  const ability = await defineAbility(req);
+  const managers = await listManagers(ability);
   return {
     props: {
       managers: JSON.parse(JSON.stringify(managers)),

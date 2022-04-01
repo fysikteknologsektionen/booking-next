@@ -2,15 +2,14 @@ import DashboardLayout from 'components/DashboardLayout';
 import type { GetServerSideProps, NextPage } from 'next';
 import Link from 'next/link';
 import type { User } from 'src/models/UserModel';
-import UserService from 'src/services/UserService';
+import { listUsers } from 'src/services/UserService';
 
 interface Props {
   users: (User & { _id: string })[];
 }
 
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
-  const service = new UserService();
-  const users = await service.listUsers();
+  const users = await listUsers();
 
   return {
     props: {

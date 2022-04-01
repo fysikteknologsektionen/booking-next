@@ -3,7 +3,7 @@ import type { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import type { ParsedUrlQuery } from 'querystring';
 import type { User } from 'src/models/UserModel';
-import UserService from 'src/services/UserService';
+import { getUserById } from 'src/services/UserService';
 
 interface Props {
   user: User & { _id: string };
@@ -23,8 +23,7 @@ export const getServerSideProps: GetServerSideProps<Props, Query> = async ({
   }
 
   // TODO: Handle 404 errors
-  const service = new UserService();
-  const user = service.getUser(params.id);
+  const user = await getUserById(params.id);
 
   return {
     props: {

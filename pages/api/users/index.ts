@@ -1,10 +1,10 @@
+import type { Ability } from '@casl/ability';
 import baseNextConnect from 'src/lib/baseNextConnect';
-import UserService from 'src/services/UserService';
+import { listUsers } from 'src/services/UserService';
 
-const service = new UserService();
-
-const handler = baseNextConnect(['GET']).get(async (req, res) => {
-  res.json(await service.listUsers());
+const handler = baseNextConnect(['GET'])
+  .get<{ ability: Ability }>(async (req, res) => {
+  res.json(await listUsers(req.ability));
 });
 
 export default handler;

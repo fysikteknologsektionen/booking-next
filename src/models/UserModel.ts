@@ -12,16 +12,16 @@ export enum UserRole {
  */
 export interface User {
   googleId: string;
-  name: string;
-  email: string;
+  name?: string;
+  email?: string;
   image?: string;
   role: UserRole;
 }
 
 const userSchema = new Schema<User>({
   googleId: { type: String, required: true, unique: true },
-  name: { type: String, required: true },
-  email: { type: String, required: true },
+  name: String,
+  email: String,
   image: String,
   role: {
     type: Number,

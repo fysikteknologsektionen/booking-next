@@ -1,14 +1,15 @@
+import type { Ability } from '@casl/ability';
+import { defineAbility } from '@casl/ability';
 import baseNextConnect from 'src/lib/baseNextConnect';
-import VenueService from 'src/services/VenueService';
-
-const service = new VenueService();
+import { createVenue, listVenues } from 'src/services/VenueService';
 
 const handler = baseNextConnect(['POST', 'GET'])
-  .post(async (req, res) => {
-    res.json(await service.createVenue(req.body));
-  })
-  .get(async (req, res) => {
-    res.json(await service.listVenues());
-  });
+  .use(defineAbility)
+  .post<{ ability: Ability }>(async (req, res) => {
+  res.json(await createVenue(req.ability, req.body));
+})
+  .get<{ ability: Ability }>(async (req, res) => {
+  res.json(await listVenues(req.ability));
+});
 
 export default handler;

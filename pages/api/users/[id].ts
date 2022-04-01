@@ -1,16 +1,17 @@
+import type { Ability } from '@casl/ability';
 import baseNextConnect from 'src/lib/baseNextConnect';
 import parseId from 'src/middlewares/parseId';
-import UserService from 'src/services/UserService';
+import { deleteUser, getUserById } from 'src/services/UserService';
 
-const service = new UserService();
+type ExtendedRequestType = { ability: Ability, id: string };
 
 const handler = baseNextConnect(['GET', 'DELETE'])
   .use(parseId)
-  .get<{ id: string }>(async (req, res) => {
-  res.json(await service.getUser(req.id));
+  .get<ExtendedRequestType>(async (req, res) => {
+  res.json(await getUserById(req.ability, req.id));
 })
-  .delete<{ id: string }>(async (req, res) => {
-  res.json(await service.deleteUser(req.id));
+  .delete<ExtendedRequestType>(async (req, res) => {
+  res.json(await deleteUser(req.ability, req.id));
 });
 
 export default handler;

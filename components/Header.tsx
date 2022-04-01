@@ -35,9 +35,7 @@ const Header: React.VFC = () => {
           <button
             className="btn btn-outline-secondary"
             type="button"
-            onClick={() => (process.env.NODE_ENV !== 'production'
-              ? signIn()
-              : signIn('google'))}
+            onClick={() => signIn('google')}
           >
             Log in
           </button>

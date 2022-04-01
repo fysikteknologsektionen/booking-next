@@ -1,17 +1,17 @@
 import DashboardLayout from 'components/DashboardLayout';
 import type { GetServerSideProps, NextPage } from 'next';
 import Link from 'next/link';
+import defineAbility from 'src/lib/defineAbility';
 import type { Venue } from 'src/models/VenueModel';
-import VenueService from 'src/services/VenueService';
+import { listVenues } from 'src/services/VenueService';
 
 interface Props {
   venues: (Venue & { _id: string })[];
 }
 
-export const getServerSideProps: GetServerSideProps<Props> = async () => {
-  const service = new VenueService();
-  const venues = await service.listVenues();
-
+export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => {
+  const ability = await defineAbility(req);
+  const venues = await listVenues(ability);
   return {
     props: {
       venues: JSON.parse(JSON.stringify(venues)),
