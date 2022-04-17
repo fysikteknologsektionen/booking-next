@@ -1,16 +1,12 @@
-import baseNextConnect from 'src/lib/baseNextConnect';
-import parseId from 'src/middlewares/parseId';
-import UserService from 'src/services/UserService';
+import nextConnect from 'lib/nextConnect';
+import { deleteUser, updateUserRole } from 'services/user';
 
-const service = new UserService();
-
-const handler = baseNextConnect(['GET', 'DELETE'])
-  .use(parseId)
-  .get<{ id: string }>(async (req, res) => {
-  res.json(await service.getUser(req.id));
+const handler = nextConnect(['GET'])
+  .delete<{ id: number }>(async (req, res) => {
+  res.json(await deleteUser(req.id));
 })
-  .delete<{ id: string }>(async (req, res) => {
-  res.json(await service.deleteUser(req.id));
+  .patch<{ id: number }>(async (req, res) => {
+  res.json(await updateUserRole(req.id, req.body.role));
 });
 
 export default handler;

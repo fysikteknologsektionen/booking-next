@@ -7,7 +7,7 @@ import type { NextHandler } from 'next-connect';
  * @param res The response object.
  * @param next The next handler function.
  */
-export default function parseId(
+export default function parseQueryId(
   req: NextApiRequest & { id: string },
   res: NextApiResponse,
   next: NextHandler,

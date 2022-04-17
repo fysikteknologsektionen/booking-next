@@ -1,10 +1,10 @@
+import type { User } from '@prisma/client';
 import { Field, Form } from 'formik';
-import type { User } from 'src/models/UserModel';
 
 interface Props {
   isSubmitting: boolean;
   status: any;
-  managers: (User & { _id: string })[];
+  managers: Pick<User, 'id' | 'name' | 'email'>[];
   submitButtonText: string;
 }
 
@@ -28,7 +28,7 @@ const VenueForm: React.VFC<Props> = ({
     </label>
     <Field as="select" multiple id="managers" name="managers">
       {managers.map((manager) => (
-        <option key={manager._id} value={manager._id}>
+        <option key={manager.id} value={manager.id}>
           {manager.email}
         </option>
       ))}

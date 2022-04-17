@@ -1,14 +1,9 @@
-import baseNextConnect from 'src/lib/baseNextConnect';
-import VenueService from 'src/services/VenueService';
+import nextConnect from 'lib/nextConnect';
+import { createVenue } from 'services/venue';
 
-const service = new VenueService();
-
-const handler = baseNextConnect(['POST', 'GET'])
+const handler = nextConnect(['POST'])
   .post(async (req, res) => {
-    res.json(await service.createVenue(req.body));
-  })
-  .get(async (req, res) => {
-    res.json(await service.listVenues());
+    res.json(await createVenue(req.body));
   });
 
 export default handler;

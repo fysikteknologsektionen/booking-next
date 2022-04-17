@@ -1,37 +1,26 @@
 import { Formik } from 'formik';
-import type { GetServerSideProps, NextPage } from 'next';
+import type { InferGetServerSidePropsType, NextPage } from 'next';
 import DashboardLayout from 'components/DashboardLayout';
 import { useRouter } from 'next/router';
 import VenueForm from 'components/VenueForm';
-import type { Venue } from 'src/models/VenueModel';
-import type { User } from 'src/models/UserModel';
-import UserService from 'src/services/UserService';
+import { getManagers } from 'services/user';
+import type { Prisma } from '@prisma/client';
 
-interface Props {
-  managers: (User & { _id: string })[];
-}
-
-export const getServerSideProps: GetServerSideProps<Props> = async () => {
-  const service = new UserService();
-
-  // TODO: Update with query filtering
-  const managers = await service.listUsers();
-
-  return {
-    props: {
-      managers: JSON.parse(JSON.stringify(managers)),
-    },
-  };
+export const getServerSideProps = async () => {
+  const managers = await getManagers();
+  return { props: { managers } };
 };
 
-const initialValues: Venue = {
+const initialValues: Prisma.VenueCreateInput = {
   name: '',
-  description: '',
-  managers: [],
+  description: undefined,
+  managers: undefined,
   enabled: false,
 };
 
-const CreateVenue: NextPage<Props> = ({ managers }) => {
+const CreateVenue: NextPage<
+InferGetServerSidePropsType<typeof getServerSideProps>
+> = ({ managers }) => {
   const router = useRouter();
   return (
     <DashboardLayout>

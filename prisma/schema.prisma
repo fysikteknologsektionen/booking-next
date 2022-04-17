@@ -1,0 +1,74 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://postgres:postgres@localhost:5432/postgres?schema=public"
+}
+
+enum Role {
+  USER
+  MANAGER
+  ADMIN
+}
+
+model User {
+  id           Int           @id @default(autoincrement())
+  createdAt    DateTime      @default(now())
+  lastLogin    DateTime      @updatedAt
+  googleId     String        @unique
+  name         String
+  email        String
+  image        String?
+  role         Role          @default(USER)
+  venues       Venue[]
+  reservations Reservation[]
+}
+
+model Timeslot {
+  id        Int      @id @default(autoincrement())
+  startTime DateTime
+  endTime   DateTime
+  venue     Venue    @relation(fields: [venueId], references: [id])
+  venueId   Int
+}
+
+model Venue {
+  id           Int           @id @default(autoincrement())
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  enabled      Boolean       @default(false)
+  name         String
+  description  String?
+  managers     User[]
+  timeslots    Timeslot[]
+  reservations Reservation[]
+}
+
+enum Status {
+  PENDING
+  ACCEPTED
+  DENIED
+}
+
+model Reservation {
+  id              Int      @id @default(autoincrement())
+  createdAt       DateTime @default(now())
+  updateAt        DateTime @updatedAt
+  description     String
+  startTime       DateTime
+  endTime         DateTime
+  venue           Venue    @relation(fields: [venueId], references: [id])
+  venueId         Int
+  status          Status   @default(PENDING)
+  client          User?    @relation(fields: [clientId], references: [id])
+  clientId        Int?
+  anonClientName  String?
+  anonClientEmail String?
+  anonClientTel   String?
+  anonClientGroup String?
+}
